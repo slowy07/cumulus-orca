@@ -491,7 +491,7 @@ class TestRequestStatusForGranuleUnit(
                 {
                     request_status_for_granule.OUTPUT_GRANULE_ID_KEY: granule_id,
                     request_status_for_granule.OUTPUT_JOB_ID_KEY: job_id,
-                    request_status_for_granule.OUTPUT_REQUEST_TIME_KEY: "2019-07-17T17:36:38.494918",
+                    request_status_for_granule.OUTPUT_REQUEST_TIME_KEY: "2019-07-17T17:36:38.494918+00:00",
                     request_status_for_granule.OUTPUT_COMPLETION_TIME_KEY: None,
                 }
             ],

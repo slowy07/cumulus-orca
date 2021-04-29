@@ -280,11 +280,11 @@ resource "aws_lambda_function" "request_status_for_granule" {
 
   ## OPTIONAL
   description      = "Provides ORCA recover status information on a specific granule and job."
-  filename         = "${path.module}/../../tasks/request_status_for_granule/request_status_for_granule.zip"
+  filename         = "${path.module}/../../tasks/request_status_for_granule_dummy/request_status_for_granule.zip"  # todo: Revert
   handler          = "request_status_for_granule.handler"
   memory_size      = var.orca_recovery_lambda_memory_size
   runtime          = "python3.7"
-  source_code_hash = filebase64sha256("${path.module}/../../tasks/request_status_for_granule/request_status_for_granule.zip")
+  source_code_hash = filebase64sha256("${path.module}/../../tasks/request_status_for_granule_dummy/request_status_for_granule.zip")  # todo: Revert
   tags             = local.tags
   timeout          = var.orca_recovery_lambda_timeout
 
@@ -303,6 +303,52 @@ resource "aws_lambda_function" "request_status_for_granule" {
   }
 }
 
+# API Gateway
+resource "aws_api_gateway_rest_api" "request_status_for_granule_api" {
+  name = "request_status_for_granule_api"
+}
+
+resource "aws_api_gateway_resource" "request_status_for_granule_api_resource" {
+  path_part   = "resource"
+  parent_id   = aws_api_gateway_rest_api.request_status_for_granule_api.root_resource_id
+  rest_api_id = aws_api_gateway_rest_api.request_status_for_granule_api.id
+}
+
+resource "aws_api_gateway_method" "request_status_for_granule_api_method" {
+  rest_api_id   = aws_api_gateway_rest_api.request_status_for_granule_api.id
+  resource_id   = aws_api_gateway_resource.request_status_for_granule_api_resource.id
+  http_method   = "GET"
+  # todo: Make sure this is locked down against external access.
+  authorization = "NONE"
+}
+
+# todo: Error coes?
+resource "aws_api_gateway_integration" "integration" {
+  rest_api_id             = aws_api_gateway_rest_api.request_status_for_granule_api.id
+  resource_id             = aws_api_gateway_resource.request_status_for_granule_api_resource.id
+  http_method             = aws_api_gateway_method.request_status_for_granule_api_method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.request_status_for_granule.invoke_arn
+}
+
+# Lambda
+resource "aws_lambda_permission" "request_status_for_granule_api_permission" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda.function_name  # todo: Pass this in
+  # todo: Could make this the accountID. https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_permission
+  principal     = "apigateway.amazonaws.com"
+
+  # More: http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-control-access-using-iam-policies-to-invoke-api.html
+  # todo: does this work?
+  #source_arn = aws_api_gateway_resource.request_status_for_granule_api.arn
+  # todo: Add accountId as var
+  #source_arn = "arn:aws:execute-api:${var.region}:${var.accountId}:${aws_api_gateway_rest_api.request_status_for_granule_api.id}/*/${aws_api_gateway_method.request_status_for_granule_api_method.http_method}${aws_api_gateway_resource.request_status_for_granule_api_resource.path}"
+}
+
+# todo: add IAM from https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_integration if needed.
+
 
 # request_status_for_job - Provides recovery status information for a job.
 # ==============================================================================
@@ -313,11 +359,11 @@ resource "aws_lambda_function" "request_status_for_job" {
 
   ## OPTIONAL
   description      = "Provides ORCA recover status information on a specific job."
-  filename         = "${path.module}/../../tasks/request_status_for_job/request_status_for_job.zip"
+  filename         = "${path.module}/../../tasks/request_status_for_job_dummy/request_status_for_job.zip"  # todo: Revert
   handler          = "request_status_for_job.handler"
   memory_size      = var.orca_recovery_lambda_memory_size
   runtime          = "python3.7"
-  source_code_hash = filebase64sha256("${path.module}/../../tasks/request_status_for_job/request_status_for_job.zip")
+  source_code_hash = filebase64sha256("${path.module}/../../tasks/request_status_for_job_dummy/request_status_for_job.zip")  # todo: Revert
   tags             = local.tags
   timeout          = var.orca_recovery_lambda_timeout
 
