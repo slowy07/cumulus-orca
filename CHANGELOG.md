@@ -105,6 +105,12 @@ See the documentation for specifics on the various files and changes specified b
   ```
 
 ### Added
+- *ORCA-163* Added shared library *shared_recovery.py* under *tasks/shared_libraries/recovery/* for posting to status SQS queue.
+  This include *post_status_for_job_to_queue()* function that posts status of jobs to SQS queue,
+  *post_status_for_job_to_queue()* function that posts status of files to SQS queue,
+  and *post_entry_to_queue()* function that is used by the above two functions for sending the message to the queue.
+  Added unit tests *test_shared_recovery.py* under *tasks/shared_libraries/recovery/test/unit_tests/* to test shared library.
+  Added new script *run_tests.sh* under *tasks/shared_libraries/recovery/bin* to run the unit tests.
 - *ORCA-92* Added two lambdas (request_status_for_file and request_status_for_job)
   for use with the Cumulus dashboard. request_status_for_file will retrieve status
   for an individual file, with the optional parameter of which job you want the
@@ -157,10 +163,11 @@ See the documentation for specifics on the various files and changes specified b
 - request_files now uses the same default glacier bucket as copy_to_glacier.
 
 ### Deprecated
-- The `request_status` lambda will be removed in future release as it has been replaced by the `requests_status_for_job` and `request_status_for_granule` lambdas.
+- None
 
 ### Removed
-- None
+- The `request_status` lambda under */tasks* is removed since it is replaced by the `requests_status_for_job` 
+  and `request_status_for_granule` lambdas. The terraform modules, shell scripts and variables related to the lambda are also removed.
 
 ### Fixed
 - Updated IAM policies to better include all buckets by type instead of looking at the bucket variable key name.
