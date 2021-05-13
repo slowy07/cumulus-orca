@@ -1,0 +1,1 @@
+From elpdvx68.cr.usgs.gov:6000/lpdaac/lpinf/docker/base-images/python/python-base:3.8.5
